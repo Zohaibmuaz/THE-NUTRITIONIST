@@ -31,7 +31,7 @@ app.mount("/", StaticFiles(directory="frontend", html=True), name="static")
 # CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "http://127.0.0.1:3000", "http://localhost:8080"],
+    allow_origins=["http://localhost:3000", "http://127.0.0.1:3000", "http://localhost:8080","https://the-nutritionist.onrender.com"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -429,5 +429,6 @@ def get_dashboard_data(current_user: User = Depends(get_current_user), db: Sessi
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)
+
 
 
