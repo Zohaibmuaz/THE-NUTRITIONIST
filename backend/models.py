@@ -1,7 +1,7 @@
 from sqlalchemy import Column, Integer, String, Float, Date, DateTime, ForeignKey, Text
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
-from database import Base
+from .database import Base
 
 class User(Base):
     __tablename__ = "users"
@@ -72,3 +72,4 @@ class MealEntry(Base):
     
     # Relationships
     daily_log = relationship("DailyLog", back_populates="meal_entries")
+
