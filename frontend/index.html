@@ -1,0 +1,974 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>THE Nutritionist™ - AI Nutrition Tracker by Zohaib Muaz</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --accent-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            --success-gradient: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+            --warning-gradient: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+            --dark-gradient: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            --glass-bg: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --neon-blue: #00f5ff;
+            --neon-purple: #bf00ff;
+            --neon-green: #39ff14;
+            --neon-pink: #ff10f0;
+        }
+
+        [data-theme="dark"] {
+            --glass-bg: rgba(0, 0, 0, 0.2);
+            --glass-border: rgba(255, 255, 255, 0.1);
+        }
+
+        * {
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background: var(--dark-gradient);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        [data-theme="light"] body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        }
+
+        /* Animated Background */
+        .animated-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .animated-bg::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(120, 219, 255, 0.3) 0%, transparent 50%);
+            animation: float 20s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            33% { transform: translate(30px, -30px) rotate(120deg); }
+            66% { transform: translate(-20px, 20px) rotate(240deg); }
+        }
+
+        /* Glassmorphism */
+        .glass {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .glass-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            box-shadow: 
+                0 8px 32px rgba(0, 0, 0, 0.1),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .glass-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 
+                0 20px 40px rgba(0, 0, 0, 0.2),
+                0 0 20px rgba(102, 126, 234, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.3);
+        }
+
+        /* Neon Effects */
+        .neon-glow {
+            box-shadow: 
+                0 0 5px currentColor,
+                0 0 10px currentColor,
+                0 0 15px currentColor,
+                0 0 20px currentColor;
+        }
+
+        .neon-text {
+            text-shadow: 
+                0 0 5px currentColor,
+                0 0 10px currentColor,
+                0 0 15px currentColor;
+        }
+
+        /* Gradient Text */
+        .gradient-text {
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .gradient-text-accent {
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* Navigation */
+        .nav-sidebar {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border-right: 1px solid var(--glass-border);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .nav-item {
+            position: relative;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            overflow: hidden;
+        }
+
+        .nav-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: var(--primary-gradient);
+            transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: -1;
+        }
+
+        .nav-item:hover::before,
+        .nav-item.active::before {
+            left: 0;
+        }
+
+        .nav-item:hover,
+        .nav-item.active {
+            color: white;
+            transform: translateX(8px);
+        }
+
+        /* Progress Bars */
+        .progress-bar {
+            background: var(--primary-gradient);
+            border-radius: 9999px;
+            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .progress-bar::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+            animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        /* Cards */
+        .stat-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--primary-gradient);
+            transform: scaleX(0);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .stat-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-12px) scale(1.03);
+            box-shadow: 
+                0 25px 50px rgba(0, 0, 0, 0.2),
+                0 0 30px rgba(102, 126, 234, 0.4);
+        }
+
+        /* Theme Toggle */
+        .theme-toggle {
+            position: relative;
+            width: 60px;
+            height: 30px;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .theme-toggle::before {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 24px;
+            height: 24px;
+            background: var(--primary-gradient);
+            border-radius: 50%;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        [data-theme="dark"] .theme-toggle::before {
+            transform: translateX(30px);
+        }
+
+        /* Animations */
+        .fade-in {
+            animation: fadeIn 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .slide-up {
+            animation: slideUp 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .scale-in {
+            animation: scaleIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from { 
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to { 
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes scaleIn {
+            from { 
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            to { 
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        /* Loading Animation */
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid var(--glass-border);
+            border-top: 3px solid var(--neon-blue);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Section Transitions */
+        .section-content {
+            display: none;
+            animation: fadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .section-content.active {
+            display: block;
+        }
+
+        /* Form Elements */
+        .form-input {
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--neon-blue);
+            box-shadow: 0 0 20px rgba(0, 245, 255, 0.3);
+        }
+
+        /* AI Chat Styling */
+        .ai-chat-content {
+            color: #ffffff !important;
+        }
+
+        .ai-chat-content h1,
+        .ai-chat-content h2,
+        .ai-chat-content h3,
+        .ai-chat-content h4,
+        .ai-chat-content h5,
+        .ai-chat-content h6 {
+            color: #ffffff !important;
+            font-weight: bold;
+        }
+
+        .ai-chat-content p {
+            color: #e5e7eb !important;
+            margin-bottom: 0.75rem;
+        }
+
+        .ai-chat-content ul,
+        .ai-chat-content ol {
+            color: #e5e7eb !important;
+            margin-left: 1.5rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .ai-chat-content li {
+            color: #e5e7eb !important;
+            margin-bottom: 0.25rem;
+        }
+
+        .ai-chat-content strong {
+            color: #ffffff !important;
+            font-weight: 600;
+        }
+
+        .ai-chat-content code {
+            background: rgba(0, 245, 255, 0.2);
+            color: #00f5ff !important;
+            padding: 0.125rem 0.25rem;
+            border-radius: 0.25rem;
+            font-size: 0.875rem;
+        }
+
+        /* Button Styles */
+        .btn-primary {
+            background: var(--primary-gradient);
+            border: none;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-primary::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn-primary:hover::before {
+            left: 100%;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        /* Chart Styling */
+        .chart-container {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 24px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .chart-container:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .nav-sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            }
+            
+            .nav-sidebar.open {
+                transform: translateX(0);
+            }
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--glass-bg);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary-gradient);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--accent-gradient);
+        }
+    </style>
+</head>
+<body data-theme="dark">
+    <!-- Animated Background -->
+    <div class="animated-bg"></div>
+    
+    <!-- Mobile Menu Button -->
+    <button id="mobile-menu-btn" class="fixed top-4 left-4 z-50 lg:hidden glass p-3 rounded-xl text-white">
+        <i class="fas fa-bars text-xl"></i>
+    </button>
+
+    <!-- Sidebar Navigation -->
+    <nav id="sidebar" class="nav-sidebar fixed left-0 top-0 h-full w-64 z-40 transform -translate-x-full lg:translate-x-0">
+        <div class="p-6">
+            <!-- Logo -->
+            <div class="flex items-center mb-8">
+                <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-400 to-purple-600 flex items-center justify-center mr-3">
+                    <i class="fas fa-leaf text-white text-xl"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl font-bold gradient-text">THE Nutritionist™</h1>
+                    <p class="text-sm text-gray-400">by Zohaib Muaz</p>
+                </div>
+            </div>
+
+            <!-- Theme Toggle -->
+            <div class="flex items-center justify-between mb-8">
+                <span class="text-sm text-gray-300">Theme</span>
+                <div class="theme-toggle" id="theme-toggle">
+                    <i class="fas fa-sun absolute top-1 left-1 text-yellow-400 text-xs"></i>
+                    <i class="fas fa-moon absolute top-1 right-1 text-blue-400 text-xs"></i>
+                </div>
+            </div>
+
+            <!-- Navigation Items -->
+            <div class="space-y-2" id="nav-buttons">
+                <button id="nav-dashboard" class="nav-item active w-full text-left px-4 py-3 rounded-xl text-gray-300 hover:text-white transition-all duration-300">
+                    <i class="fas fa-tachometer-alt mr-3"></i>Dashboard
+                </button>
+                <button id="nav-meals" class="nav-item w-full text-left px-4 py-3 rounded-xl text-gray-300 hover:text-white transition-all duration-300">
+                    <i class="fas fa-utensils mr-3"></i>Log Meals
+                </button>
+                <button id="nav-charts" class="nav-item w-full text-left px-4 py-3 rounded-xl text-gray-300 hover:text-white transition-all duration-300">
+                    <i class="fas fa-chart-line mr-3"></i>Analytics
+                </button>
+                <button id="nav-nutritionist" class="nav-item w-full text-left px-4 py-3 rounded-xl text-gray-300 hover:text-white transition-all duration-300">
+                    <i class="fas fa-robot mr-3"></i>AI Nutritionist
+                </button>
+                <button id="nav-analysis" class="nav-item w-full text-left px-4 py-3 rounded-xl text-gray-300 hover:text-white transition-all duration-300">
+                    <i class="fas fa-chart-bar mr-3"></i>Reports
+                </button>
+            </div>
+
+            <!-- User Info & Logout -->
+            <div class="absolute bottom-6 left-6 right-6">
+                <div class="glass-card p-4 rounded-xl">
+                    <div class="flex items-center mb-3">
+                        <div class="w-10 h-10 rounded-full bg-gradient-to-br from-green-400 to-blue-500 flex items-center justify-center mr-3">
+                            <i class="fas fa-user text-white"></i>
+                        </div>
+                        <div>
+                            <p class="text-sm font-medium text-white" id="user-name">Welcome</p>
+                            <p class="text-xs text-gray-400">Ready to track!</p>
+                        </div>
+                </div>
+                    <button id="logout-btn" class="hidden w-full bg-gradient-to-r from-red-500 to-pink-500 text-white py-2 px-4 rounded-lg hover:from-red-600 hover:to-pink-600 transition-all duration-300">
+                        <i class="fas fa-sign-out-alt mr-2"></i>Logout
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Overlay for mobile -->
+    <div id="sidebar-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-30 hidden lg:hidden"></div>
+
+    <!-- Main Content -->
+    <main class="lg:ml-64 min-h-screen">
+        <!-- Login/Register Form -->
+        <div id="auth-container" class="max-w-md mx-auto px-4 py-20">
+            <div class="glass-card rounded-3xl p-8 fade-in">
+                <div class="text-center mb-8">
+                    <div class="w-20 h-20 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-blue-400 to-purple-600 flex items-center justify-center">
+                        <i class="fas fa-leaf text-white text-3xl"></i>
+                    </div>
+                    <h2 class="text-3xl font-bold gradient-text mb-2">Welcome to THE Nutritionist™</h2>
+                    <p class="text-gray-300">Track your meals and achieve your fitness goals with AI</p>
+                    <p class="text-xs text-gray-500 mt-2">Developed by Zohaib Muaz</p>
+                </div>
+
+                <!-- Auth Tabs -->
+                <div class="flex mb-8 bg-gray-800 rounded-xl p-1">
+                    <button id="login-tab" class="flex-1 py-3 px-4 text-center font-medium text-white bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg transition-all duration-300">
+                        Login
+                    </button>
+                    <button id="register-tab" class="flex-1 py-3 px-4 text-center font-medium text-gray-400 hover:text-white transition-all duration-300">
+                        Register
+                    </button>
+                </div>
+
+                <!-- Login Form -->
+                <form id="login-form" class="space-y-6">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300 mb-3">Email</label>
+                        <input type="email" id="login-email" required 
+                               class="form-input w-full px-4 py-3 rounded-xl text-white placeholder-gray-400">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300 mb-3">Password</label>
+                        <input type="password" id="login-password" required 
+                               class="form-input w-full px-4 py-3 rounded-xl text-white placeholder-gray-400">
+                    </div>
+                    <button type="submit" class="btn-primary w-full py-3 px-6 rounded-xl text-white font-medium">
+                        <i class="fas fa-sign-in-alt mr-2"></i>Login
+                    </button>
+                </form>
+
+                <!-- Register Form -->
+                <form id="register-form" class="space-y-6 hidden">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300 mb-3">Full Name</label>
+                        <input type="text" id="register-name" required 
+                               class="form-input w-full px-4 py-3 rounded-xl text-white placeholder-gray-400">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300 mb-3">Email</label>
+                        <input type="email" id="register-email" required 
+                               class="form-input w-full px-4 py-3 rounded-xl text-white placeholder-gray-400">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300 mb-3">Password</label>
+                        <input type="password" id="register-password" required 
+                               class="form-input w-full px-4 py-3 rounded-xl text-white placeholder-gray-400">
+                    </div>
+                    <button type="submit" class="w-full bg-gradient-to-r from-green-500 to-teal-500 text-white py-3 px-6 rounded-xl font-medium hover:from-green-600 hover:to-teal-600 transition-all duration-300">
+                        <i class="fas fa-user-plus mr-2"></i>Register
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Profile Setup -->
+        <div id="profile-setup" class="max-w-2xl mx-auto px-4 py-20 hidden">
+            <div class="glass-card rounded-3xl p-8 slide-up">
+                <div class="text-center mb-8">
+                    <div class="w-20 h-20 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-purple-400 to-pink-600 flex items-center justify-center">
+                        <i class="fas fa-user-cog text-white text-3xl"></i>
+                    </div>
+                    <h2 class="text-3xl font-bold gradient-text mb-2">Complete Your Profile</h2>
+                    <p class="text-gray-300">Help us personalize your nutrition journey</p>
+                </div>
+
+                <form id="profile-form" class="space-y-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300 mb-3">Age</label>
+                            <input type="number" id="profile-age" required min="1" max="120"
+                                   class="form-input w-full px-4 py-3 rounded-xl text-white placeholder-gray-400">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300 mb-3">Weight (kg)</label>
+                            <input type="number" id="profile-weight" required min="1" step="0.1"
+                                   class="form-input w-full px-4 py-3 rounded-xl text-white placeholder-gray-400">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300 mb-3">Height (cm)</label>
+                            <input type="number" id="profile-height" required min="1" step="0.1"
+                                   class="form-input w-full px-4 py-3 rounded-xl text-white placeholder-gray-400">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300 mb-3">Gender</label>
+                            <select id="profile-gender" required
+                                    class="form-input w-full px-4 py-3 rounded-xl text-white">
+                                <option value="" class="bg-gray-800">Select Gender</option>
+                                <option value="male" class="bg-gray-800">Male</option>
+                                <option value="female" class="bg-gray-800">Female</option>
+                                <option value="other" class="bg-gray-800">Other</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300 mb-3">Activity Level</label>
+                        <select id="profile-activity" required
+                                class="form-input w-full px-4 py-3 rounded-xl text-white">
+                            <option value="" class="bg-gray-800">Select Activity Level</option>
+                            <option value="sedentary" class="bg-gray-800">Sedentary (little to no exercise)</option>
+                            <option value="lightly_active" class="bg-gray-800">Lightly Active (light exercise 1-3 days/week)</option>
+                            <option value="moderately_active" class="bg-gray-800">Moderately Active (moderate exercise 3-5 days/week)</option>
+                            <option value="very_active" class="bg-gray-800">Very Active (hard exercise 6-7 days/week)</option>
+                            <option value="extremely_active" class="bg-gray-800">Extremely Active (very hard exercise, physical job)</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300 mb-3">Fitness Goal</label>
+                        <select id="profile-goal" required
+                                class="form-input w-full px-4 py-3 rounded-xl text-white">
+                            <option value="" class="bg-gray-800">Select Fitness Goal</option>
+                            <option value="lose_weight" class="bg-gray-800">Lose Weight</option>
+                            <option value="maintain_weight" class="bg-gray-800">Maintain Weight</option>
+                            <option value="gain_weight" class="bg-gray-800">Gain Weight</option>
+                        </select>
+                    </div>
+
+                    <button type="submit" class="btn-primary w-full py-3 px-6 rounded-xl text-white font-medium">
+                        <i class="fas fa-save mr-2"></i>Complete Setup
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Dashboard -->
+        <div id="dashboard" class="hidden px-4 py-8">
+            <!-- Welcome Section -->
+            <div class="glass-card rounded-3xl p-8 mb-8 slide-up">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h2 class="text-3xl font-bold gradient-text mb-2">Welcome back!</h2>
+                        <p class="text-gray-300 text-lg" id="welcome-message">Track your meals and stay on top of your goals</p>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-sm text-gray-400">Today</p>
+                        <p class="text-xl font-semibold text-white" id="current-date"></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dashboard Section -->
+            <div id="section-dashboard" class="section-content active">
+                <!-- Stats Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                    <div class="stat-card rounded-2xl p-6 scale-in">
+                        <div class="flex items-center mb-4">
+                            <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-red-400 to-pink-500 flex items-center justify-center mr-4">
+                                <i class="fas fa-fire text-white text-xl"></i>
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-gray-300">Calories</p>
+                                <p class="text-2xl font-bold text-white" id="calories-consumed">0</p>
+                            </div>
+                        </div>
+                        <div class="mb-2">
+                            <div class="flex justify-between text-sm">
+                                <span class="text-gray-400">Progress</span>
+                                <span class="text-gray-300">of <span id="calories-goal">0</span></span>
+                            </div>
+                        </div>
+                        <div class="bg-gray-700 rounded-full h-3 overflow-hidden">
+                            <div class="bg-gradient-to-r from-red-400 to-pink-500 h-3 rounded-full progress-bar" id="calories-progress" style="width: 0%"></div>
+                        </div>
+                    </div>
+
+                    <div class="stat-card rounded-2xl p-6 scale-in" style="animation-delay: 0.1s">
+                        <div class="flex items-center mb-4">
+                            <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-400 to-cyan-500 flex items-center justify-center mr-4">
+                                <i class="fas fa-dumbbell text-white text-xl"></i>
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-gray-300">Protein</p>
+                                <p class="text-2xl font-bold text-white" id="protein-consumed">0g</p>
+                            </div>
+                        </div>
+                        <div class="mb-2">
+                            <div class="flex justify-between text-sm">
+                                <span class="text-gray-400">Progress</span>
+                                <span class="text-gray-300">of <span id="protein-goal">0g</span></span>
+                            </div>
+                        </div>
+                        <div class="bg-gray-700 rounded-full h-3 overflow-hidden">
+                            <div class="bg-gradient-to-r from-blue-400 to-cyan-500 h-3 rounded-full progress-bar" id="protein-progress" style="width: 0%"></div>
+                        </div>
+                    </div>
+
+                    <div class="stat-card rounded-2xl p-6 scale-in" style="animation-delay: 0.2s">
+                        <div class="flex items-center mb-4">
+                            <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-green-400 to-emerald-500 flex items-center justify-center mr-4">
+                                <i class="fas fa-bread-slice text-white text-xl"></i>
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-gray-300">Carbs</p>
+                                <p class="text-2xl font-bold text-white" id="carbs-consumed">0g</p>
+                            </div>
+                        </div>
+                        <div class="mb-2">
+                            <div class="flex justify-between text-sm">
+                                <span class="text-gray-400">Progress</span>
+                                <span class="text-gray-300">of <span id="carbs-goal">0g</span></span>
+                            </div>
+                        </div>
+                        <div class="bg-gray-700 rounded-full h-3 overflow-hidden">
+                            <div class="bg-gradient-to-r from-green-400 to-emerald-500 h-3 rounded-full progress-bar" id="carbs-progress" style="width: 0%"></div>
+                        </div>
+                    </div>
+
+                    <div class="stat-card rounded-2xl p-6 scale-in" style="animation-delay: 0.3s">
+                        <div class="flex items-center mb-4">
+                            <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-yellow-400 to-orange-500 flex items-center justify-center mr-4">
+                                <i class="fas fa-seedling text-white text-xl"></i>
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-gray-300">Fats</p>
+                                <p class="text-2xl font-bold text-white" id="fats-consumed">0g</p>
+                            </div>
+                            </div>
+                        <div class="mb-2">
+                            <div class="flex justify-between text-sm">
+                                <span class="text-gray-400">Progress</span>
+                                <span class="text-gray-300">of <span id="fats-goal">0g</span></span>
+                            </div>
+                        </div>
+                        <div class="bg-gray-700 rounded-full h-3 overflow-hidden">
+                            <div class="bg-gradient-to-r from-yellow-400 to-orange-500 h-3 rounded-full progress-bar" id="fats-progress" style="width: 0%"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Today's Meals Summary -->
+                <div class="glass-card rounded-2xl p-6 slide-up">
+                    <h3 class="text-2xl font-bold gradient-text mb-6">
+                        <i class="fas fa-list mr-3"></i>Today's Meals Summary
+                    </h3>
+                    <div id="meals-summary" class="space-y-4">
+                        <!-- Meals will be populated here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Meals Section -->
+            <div id="section-meals" class="section-content">
+                <div class="glass-card rounded-2xl p-6 slide-up">
+                    <h3 class="text-2xl font-bold gradient-text mb-6">
+                        <i class="fas fa-plus-circle text-blue-400 mr-3"></i>Log Your Meals
+                    </h3>
+                    
+                    <!-- Date Selector -->
+                    <div class="mb-6 p-4 glass rounded-xl">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-4">
+                                <label class="text-sm font-medium text-gray-300">Select Date:</label>
+                                <input type="date" id="meal-date" 
+                                       class="form-input px-4 py-2 rounded-lg text-white">
+                            </div>
+                            <div class="text-sm text-gray-300">
+                                <span id="selected-date-display">Today</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <form id="meal-form" class="mb-6">
+                        <div class="flex space-x-4">
+                            <input type="text" id="meal-description" placeholder="e.g., an apple and a handful of almonds" required
+                                   class="form-input flex-1 px-4 py-3 rounded-xl text-white placeholder-gray-400">
+                            <button type="submit" class="btn-primary px-6 py-3 rounded-xl text-white font-medium">
+                                <i class="fas fa-plus mr-2"></i>Add Meal
+                            </button>
+                        </div>
+                    </form>
+
+                    <!-- Today's Meals -->
+                    <div>
+                        <h4 class="text-xl font-semibold text-white mb-6">Today's Meals</h4>
+                        <div id="meals-list" class="space-y-4">
+                            <!-- Meals will be populated here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts Section -->
+            <div id="section-charts" class="section-content">
+                <!-- Chart Controls -->
+                <div class="mb-6 p-4 glass rounded-xl">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center space-x-4">
+                            <label class="text-sm font-medium text-gray-300">Chart Period:</label>
+                            <select id="chart-period" class="form-input px-4 py-2 rounded-lg text-white">
+                                <option value="7" class="bg-gray-800">Last 7 Days</option>
+                                <option value="14" class="bg-gray-800">Last 14 Days</option>
+                                <option value="30" class="bg-gray-800">Last 30 Days</option>
+                            </select>
+                        </div>
+                        <button id="refresh-charts" class="btn-primary px-6 py-2 rounded-lg text-white font-medium">
+                            <i class="fas fa-sync-alt mr-2"></i>Refresh Charts
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Charts Grid -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                    <!-- Daily Calorie Comparison -->
+                    <div class="chart-container">
+                        <h3 class="text-xl font-bold gradient-text mb-4">
+                            <i class="fas fa-chart-bar text-blue-400 mr-2"></i>Daily Calorie Intake
+                        </h3>
+                        <div class="relative h-64">
+                            <canvas id="daily-calories-chart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Macro Distribution -->
+                    <div class="chart-container">
+                        <h3 class="text-xl font-bold gradient-text mb-4">
+                            <i class="fas fa-chart-pie text-purple-400 mr-2"></i>Macro Distribution
+                        </h3>
+                        <div class="relative h-64">
+                            <canvas id="macro-chart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <!-- Weekly Trends -->
+                    <div class="chart-container">
+                        <h3 class="text-xl font-bold gradient-text mb-4">
+                            <i class="fas fa-chart-line text-green-400 mr-2"></i>Weekly Trends
+                        </h3>
+                        <div class="relative h-64">
+                            <canvas id="weekly-chart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Goal Progress -->
+                    <div class="chart-container">
+                        <h3 class="text-xl font-bold gradient-text mb-4">
+                            <i class="fas fa-target text-orange-400 mr-2"></i>Goal Progress
+                        </h3>
+                        <div class="relative h-64">
+                            <canvas id="goal-progress-chart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- AI Nutritionist Section -->
+            <div id="section-nutritionist" class="section-content">
+                <div class="glass-card rounded-2xl p-6 slide-up">
+                    <div class="flex items-center justify-between mb-6">
+                        <h3 class="text-2xl font-bold gradient-text">
+                            <i class="fas fa-robot text-purple-400 mr-3"></i>AI Nutritionist
+                        </h3>
+                        <button id="clear-chat-btn" class="bg-gradient-to-r from-gray-500 to-gray-600 text-white px-4 py-2 rounded-lg hover:from-gray-600 hover:to-gray-700 transition-all duration-300 text-sm">
+                            <i class="fas fa-trash mr-2"></i>Clear Chat
+                        </button>
+                    </div>
+                    <div id="ai-chat" class="h-96 overflow-y-auto glass rounded-xl p-6 mb-6">
+                        <div class="text-center text-gray-400">
+                            <i class="fas fa-comments text-3xl mb-3"></i>
+                            <p class="text-lg">Ask me anything about nutrition!</p>
+                            <p class="text-sm">I'm here to help you make better food choices</p>
+                        </div>
+                    </div>
+                    <form id="ai-form" class="flex space-x-3">
+                        <input type="text" id="ai-question" placeholder="Ask a nutrition question..." required
+                               class="form-input flex-1 px-4 py-3 rounded-xl text-white placeholder-gray-400">
+                        <button type="submit" class="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-6 py-3 rounded-xl hover:from-purple-600 hover:to-pink-600 transition-all duration-300">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Meal Analysis Section -->
+            <div id="section-analysis" class="section-content">
+                <div class="glass-card rounded-2xl p-6 slide-up">
+                    <div class="flex items-center justify-between mb-6">
+                        <h3 class="text-2xl font-bold gradient-text">
+                            <i class="fas fa-chart-bar text-orange-400 mr-3"></i>Comprehensive Analysis
+                        </h3>
+                        <div class="flex space-x-3">
+                            <button id="generate-report-btn" class="bg-gradient-to-r from-orange-500 to-red-500 text-white px-6 py-2 rounded-lg hover:from-orange-600 hover:to-red-600 transition-all duration-300">
+                                <i class="fas fa-file-alt mr-2"></i>Generate Report
+                            </button>
+                            <button id="download-report-btn" class="bg-gradient-to-r from-green-500 to-teal-500 text-white px-6 py-2 rounded-lg hover:from-green-600 hover:to-teal-600 transition-all duration-300">
+                                <i class="fas fa-download mr-2"></i>Download Report
+                            </button>
+                        </div>
+                    </div>
+                    <div id="analysis-report" class="prose max-w-none">
+                        <div class="text-center text-gray-400 py-12">
+                            <div class="w-20 h-20 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-orange-400 to-red-500 flex items-center justify-center">
+                                <i class="fas fa-chart-bar text-white text-3xl"></i>
+                            </div>
+                            <p class="text-xl mb-2">Ready for Your Nutrition Analysis</p>
+                            <p class="text-sm">Click "Generate Report" to get your personalized nutrition analysis</p>
+                            <p class="text-xs mt-2">This will analyze your eating patterns, progress, and provide recommendations</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="lg:ml-64 mt-8 pb-4">
+        <div class="text-center">
+            <p class="text-gray-400 text-sm">
+                © 2025 <span class="gradient-text font-semibold">THE Nutritionist™</span> - 
+                Developed with ❤️ by <span class="text-cyan-400 font-medium">Zohaib Muaz</span>
+            </p>
+            <p class="text-gray-500 text-xs mt-1">
+                AI-Powered Nutrition Tracking & Health Management System
+            </p>
+        </div>
+    </footer>
+
+    <!-- Loading Overlay -->
+    <div id="loading-overlay" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center hidden z-50 backdrop-blur-sm">
+        <div class="glass-card rounded-2xl p-8 flex items-center space-x-4">
+            <div class="loading-spinner"></div>
+            <span class="text-white text-lg font-medium">Loading...</span>
+        </div>
+    </div>
+
+    <!-- Toast Notifications -->
+    <div id="toast-container" class="fixed top-4 right-4 z-50 space-y-3"></div>
+
+    <script src="js/app.js"></script>
+</body>
+</html>

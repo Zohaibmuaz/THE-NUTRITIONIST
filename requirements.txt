@@ -1,0 +1,35 @@
+# THE Nutritionist™ - Dependencies
+# Developed by Zohaib Muaz
+
+# Core web framework
+fastapi==0.104.1
+uvicorn[standard]==0.24.0
+
+# Database
+sqlalchemy==2.0.23
+psycopg2-binary
+
+# Authentication & Security
+python-jose[cryptography]==3.3.0
+passlib[bcrypt]==1.7.4
+python-multipart==0.0.6
+
+# Data validation
+pydantic==2.5.0
+email-validator==2.1.0
+
+# AI & ML (if using external APIs)
+openai==1.3.5
+requests==2.31.0
+
+# Streamlit for Hugging Face deployment
+streamlit==1.28.1
+
+# Utilities
+python-dotenv==1.0.0
+datetime
+pathlib2==2.3.7
+
+# Development
+pytest==7.4.3
+httpx==0.25.2

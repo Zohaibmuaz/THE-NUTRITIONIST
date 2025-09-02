@@ -1,0 +1,5 @@
+# System packages for Hugging Face Spaces
+# THE Nutritionist™ by Zohaib Muaz
+
+# For any additional system dependencies if needed
+# Currently not required for this Streamlit app
