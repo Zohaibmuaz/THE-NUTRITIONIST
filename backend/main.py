@@ -1,5 +1,6 @@
 from fastapi import FastAPI, Depends, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from sqlalchemy.orm import Session
 import uvicorn
@@ -25,6 +26,7 @@ load_dotenv()
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title="Calorie & Diet Tracker API", version="1.0.0")
+app.mount("/", StaticFiles(directory="frontend", html=True), name="static")
 
 # CORS middleware
 app.add_middleware(
@@ -427,4 +429,5 @@ def get_dashboard_data(current_user: User = Depends(get_current_user), db: Sessi
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)
+
 
