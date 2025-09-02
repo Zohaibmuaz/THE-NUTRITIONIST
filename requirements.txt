@@ -1,5 +1,6 @@
 # THE Nutritionist™ - Dependencies
-# Developed by Zohaib Muaz
+
+google-generativeai
 
 # Core web framework
 fastapi==0.104.1
@@ -33,3 +34,4 @@ pathlib2==2.3.7
 # Development
 pytest==7.4.3
 httpx==0.25.2
+
