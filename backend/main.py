@@ -6,14 +6,14 @@ import uvicorn
 from dotenv import load_dotenv
 import os
 
-from database import get_db, engine, Base
-from models import User, UserProfile, DailyLog, MealEntry
-from schemas import (
+from .database import get_db, engine, Base
+from .models import User, UserProfile, DailyLog, MealEntry
+from .schemas import (
     UserCreate, UserLogin, UserResponse, ProfileCreate, ProfileResponse,
     MealLogCreate, MealLogResponse, DailyLogResponse, AIQuestion, AIResponse
 )
-from auth import create_access_token, verify_token, get_password_hash, verify_password
-from services import (
+from .auth import create_access_token, verify_token, get_password_hash, verify_password
+from .services import (
     calculate_bmr, calculate_tdee, get_daily_summary,
     analyze_meal_with_ai, get_ai_nutrition_advice
 )
@@ -427,3 +427,4 @@ def get_dashboard_data(current_user: User = Depends(get_current_user), db: Sessi
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)
+
