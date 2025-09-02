@@ -5,7 +5,7 @@ import re
 from typing import Dict, Any
 from sqlalchemy.orm import Session
 from datetime import date
-from models import DailyLog, MealEntry
+from .models import DailyLog, MealEntry
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -645,3 +645,4 @@ def generate_comprehensive_report_html(user_id: int, user_profile, db: Session) 
     """
     
     return html_content
+
